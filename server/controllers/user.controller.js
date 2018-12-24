@@ -4,7 +4,7 @@ import errorHandler from "./../helpers/dbErrorHandler";
 
 const create = (req, res, next) => {
   const user = new User(req.body);
-  user.save(err => {
+  user.save((err, result) => {
     if (err) {
       return res.status(400).json({
         error: errorHandler.getErrorMessage(err)
@@ -17,22 +17,20 @@ const create = (req, res, next) => {
 };
 
 const list = (req, res) => {
-  user
-    .find((err, users) => {
-      if (err) {
-        return res.status(400).json({
-          error: errorHandler.getErrorMessage(err)
-        });
-      }
-      res.json(users);
-    })
-    .select("name email updated created");
+  User.find((err, users) => {
+    if (err) {
+      return res.status(400).json({
+        error: errorHandler.getErrorMessage(err)
+      });
+    }
+    res.json(users);
+  }).select("name email updated created");
 };
 
 const userByID = (req, res, next, id) => {
-  user.findById(id).exec((err, user) => {
-    if (err) {
-      res.status(400).json({
+  User.findById(id).exec((err, user) => {
+    if (err || !user) {
+      return res.status(400).json({
         error: "User not found"
       });
     }
@@ -42,18 +40,18 @@ const userByID = (req, res, next, id) => {
 };
 
 const read = (req, res) => {
-  read.profile.hashed_password = undefined;
-  read.profile.salt = undefined;
+  req.profile.hashed_password = undefined;
+  req.profile.salt = undefined;
   return res.json(req.profile);
 };
 
 const update = (req, res, next) => {
   let user = req.profile;
-  user = _.extended(user, req.body);
+  user = _.extend(user, req.body);
   user.updated = Date.now();
-  user.save(err => {
+  user.save((err, result) => {
     if (err) {
-      res.status(400).json({
+      return res.status(400).json({
         error: errorHandler.getErrorMessage(err)
       });
     }

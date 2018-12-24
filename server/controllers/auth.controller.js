@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import expressJwt from "express-jwt";
 import config from "../../config/config";
 
-const Signin = (req, res) => {
+const signin = (req, res) => {
   User.findOne(
     {
       email: req.body.email
@@ -37,26 +37,26 @@ const Signin = (req, res) => {
   );
 };
 
-const Signout = (req, res) => {
+const signout = (req, res) => {
   res.clearCookie("t");
   return res.status(200).json({
     message: "signed out"
   });
 };
 
-const RequireSignIn = expressJwt({
+const requireSignIn = expressJwt({
   secret: config.jwtSecret,
   userProperty: "auth"
 });
 
-const HasAuthorized = (req, res, next) => {
+const hasAuthorized = (req, res, next) => {
   const authroized = req.profile && req.auth && req.profile._id == req.auth._id;
   if (!authroized) {
-    return res.statu(403).json({
+    return res.status(403).json({
       error: "User is not Authorized"
     });
   }
   next();
 };
 
-export default { Signin, Signout, RequireSignIn, HasAuthorized };
+export default { signin, signout, requireSignIn, hasAuthorized };

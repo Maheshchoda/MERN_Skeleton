@@ -1,10 +1,11 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
+import crypto from "crypto";
 
-const UserSchema = new Schema({
+const UserSchema = new mongoose.Schema({
   name: {
     type: String,
     trim: true,
-    Required: "Name is Required"
+    required: "Name is Required"
   },
   email: {
     type: String,
@@ -14,24 +15,24 @@ const UserSchema = new Schema({
       /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
       "please fill a valid email address"
     ],
-    Required: "Email is Required"
+    required: "Email is Required"
   },
-  created: {
-    type: Date,
-    default: Date.now()
-  },
-  updated: Date,
   hashed_password: {
     type: String,
     required: "Password is Required"
   },
-  salt: String
+  salt: String,
+  created: {
+    type: Date,
+    default: Date.now()
+  },
+  updated: Date
 });
 
 UserSchema.virtual("password")
   .set(function(password) {
-    this_password = password;
-    this.salt = salt;
+    this._password = password;
+    this.salt = this.makeSalt();
     this.hashed_password = this.encryptPassword(password);
   })
   .get(function() {

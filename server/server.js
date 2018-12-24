@@ -7,7 +7,7 @@ mongoose.Promise = global.Promise;
 mongoose
   .connect(
     config.mongoUri,
-    { useNewUrlParser: true }
+    { useCreateIndex: true, useNewUrlParser: true }
   )
   .then(() => {
     console.log(`Connected to the Database`);
@@ -18,5 +18,5 @@ mongoose
 
 app.listen(config.port, err => {
   if (err) console.log(err);
-  console.log("server started at port %s", config.port);
+  console.info("server started at port %s", config.port);
 });
